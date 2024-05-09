@@ -8,3 +8,21 @@
 <form action="/logout" method="post">
     <button type="submit">Cerrar Sesión</button>
 </form>
+
+<h1>Image Gallery</h1>
+{% if images %}
+    <div>
+        {% for image in images %}
+            <div>
+                <img src="https://th.bing.com/th/id/OIP.4LrWM2SoZ_6mUiEsJUv4aQAAAA?rs=1&pid=ImgDetMain" alt="{{ image.nombre }}">
+                <form action="{{ url_for('delete_image', idImagen=image.idImagen) }}" method="post">
+                    <button type="submit">Delete</button>
+                </form>
+            </div>
+        {% endfor %}
+    </div>
+{% else %}
+    <p>No images uploaded yet.</p>
+{% endif %}
+
+

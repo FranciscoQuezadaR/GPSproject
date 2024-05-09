@@ -31,8 +31,14 @@ def before_request():
         return redirect(url_for('login'))
 
 @app.route('/')
+@login_required
 def index():
-    return render_template('index.html')
+    cur = mysql.connection.cursor()
+    cur.execute('SELECT * FROM imagen WHERE usuarioidUsuario = %s', (session['idUsuario'],))
+    images = cur.fetchall()
+    cur.close()
+    return render_template('index.html', images=images)
+
 
 @app.route('/login', methods=["GET", "POST"])
 def login():
