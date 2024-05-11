@@ -8,10 +8,10 @@ app = Flask(__name__, template_folder='template')
 
 app.config['SECRET_KEY'] = 'llave'  # Clave para sesiones
 
-app.config['MYSQL_HOST'] = 'localhost'
-app.config['MYSQL_USER'] = 'root'
-app.config['MYSQL_PASSWORD'] = ''
-app.config['MYSQL_DB'] = 'iamodel'
+app.config['MYSQL_HOST'] = 'sql5.freemysqlhosting.net'
+app.config['MYSQL_USER'] = 'sql5705708'
+app.config['MYSQL_PASSWORD'] = 'EDRCKtWGpy'
+app.config['MYSQL_DB'] = 'sql5705708'
 app.config['MYSQL_CURSORCLASS'] = 'DictCursor'
 mysql = MySQL(app)
 
@@ -34,9 +34,15 @@ def before_request():
 @login_required
 def index():
     cur = mysql.connection.cursor()
+
     cur.execute('SELECT * FROM imagen WHERE usuarioidUsuario = %s', (session['idUsuario'],))
     images = cur.fetchall()
     cur.close()
+
+    if not images:
+        # Si no hay imágenes, renderiza una plantilla vacía o muestra un mensaje indicando que no hay imágenes.
+        return render_template('index.html')  # Puedes crear una plantilla específica para este caso si lo prefieres.
+
     return render_template('index.html', images=images)
 
 
@@ -48,6 +54,7 @@ def login():
         _password = request.form['txtPassword']
 
         cur = mysql.connection.cursor()
+        print(cur);
         cur.execute('SELECT * FROM usuario WHERE usuario = %s AND correo = %s AND contrasena = %s', (_usuario, _correo, _password,))
         account = cur.fetchone()
         cur.close()
@@ -76,13 +83,13 @@ def upload_file():
 
         file_path = os.path.join(uploads_dir, filename)
         file.save(file_path)
-        
+
         cur = mysql.connection.cursor()
         cur.execute('INSERT INTO imagen (nombre, formato, ruta, usuarioidUsuario) VALUES (%s, %s, %s, %s)',
                     (filename, 'jpg', f"/uploads/{filename}", session['idUsuario']))
         mysql.connection.commit()
         cur.close()
-        
+
     return redirect(url_for('index'))
 
 @app.route('/logout', methods=['GET', 'POST'])
@@ -100,4 +107,4 @@ def delete_image(idImagen):
     return redirect(url_for('index'))
 
 if __name__ == '__main__':
-    app.run(port=3000, debug=True)
+    app.run(port=3000, debug=True, use_reloader=False)
