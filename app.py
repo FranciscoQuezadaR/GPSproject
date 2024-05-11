@@ -2,7 +2,6 @@ from flask import Flask, render_template, request, redirect, url_for, session
 import os
 from flask_mysqldb import MySQL, MySQLdb
 from functools import wraps
-from flask import current_app
 
 app = Flask(__name__, template_folder='template')
 
@@ -107,4 +106,5 @@ def delete_image(idImagen):
     return redirect(url_for('index'))
 
 if __name__ == '__main__':
-    app.run(port=3000, debug=True, use_reloader=False)
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", port=port)
